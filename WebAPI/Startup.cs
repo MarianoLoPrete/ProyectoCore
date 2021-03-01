@@ -17,6 +17,10 @@ using MediatR;
 using Aplicacion.Cursos;
 using FluentValidation.AspNetCore;
 using WebAPI.Middleware;
+using Dominio;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Authentication;
 
 namespace WebAPI
 {
@@ -37,8 +41,14 @@ namespace WebAPI
             });
 
             services.AddMediatR(typeof(Consulta.Manejador).Assembly);
+            
             services.AddControllers().AddFluentValidation( cfg => cfg.RegisterValidatorsFromAssemblyContaining<Nuevo>());
-
+            var builder = services.AddIdentityCore<Usuario>();
+            var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
+            identityBuilder.AddEntityFrameworkStores<CursosOnlineContext>();
+            identityBuilder.AddSignInManager<SignInManager<Usuario>>();
+            services.TryAddSingleton<ISystemClock, SystemClock>();
+            
             // services.AddSwaggerGen(c =>
             // {
             //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPI", Version = "v1" });
